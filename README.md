@@ -32,9 +32,9 @@ There are some requirements, but these are simple:
 
 ## Getting Started
 
-I have made this guide as simple and straightforward as possible. I am not a coder by any means. I am a writer, so I have put it together from a beginner's mindset. This process should all be possible by someone who has decided to switch to Linux Mint after using Windows. 
+I have made this guide as simple and straightforward as possible. I am not a coder by any means. I am a writer, so I have put it together from a beginner's mindset. This process should all be possible by someone who has decided to switch to Linux Mint after using Windows. Any errors should be covered in troubleshooting. I will add that the documentation for the programs we will be using is quite complete, also, so you can refer to that if you get stuck.
 
-Any errors should be covered in troubleshooting. I will add that the documentation for the programs we will be using is quite complete, also, so you can refer to that if you get stuck.
+To get started, download PODMAN AI PET README near the top of this page.
 
 ---
 
