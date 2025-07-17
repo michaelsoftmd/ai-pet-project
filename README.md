@@ -4,7 +4,7 @@ A fully contained, daemonless, secure method for storing and using LLM locally o
 
 ## Overview
 
-Congratulations on choosing to build your own secure AI Pet! We will be using Podman, Ollama, and AnythingLLM to put this all together, but never fear, the process is quite simple. 
+Congratulations on choosing to build your own secure AI Pet! Soon you will be the proud owner of your very first Pokemon. We will be using Podman, Ollama, and AnythingLLM to put this all together, but never fear, the process is quite simple. 
 
 ## Advantages
 
