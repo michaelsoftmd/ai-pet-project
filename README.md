@@ -1,6 +1,6 @@
 # AI Pet Project
 
-A fully contained, daemonless, secure method for storing and using LLM locally on a mounted SSD. Uses Podman, Ollama, and AnythingLLM.
+A fully contained, daemonless, secure method for storing and using LLMs locally on a mounted SSD. Uses Podman, Ollama, and AnythingLLM.
 
 ## Overview
 
