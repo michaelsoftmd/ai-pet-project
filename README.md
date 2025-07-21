@@ -26,7 +26,7 @@ Here are some advantages over other methods:
 
 - **CPU or GPU**: You can choose between running your LLMs on CPU (with Ollama) or with AMD GPU acceleration (with llama.cpp and Vulkan).
 
-- **Full Capabilities**: The AI is still fully capable of agentic behaviour, including web browsing (if you let it).
+- **Full Capabilities**: The AI is still fully capable of agentic behaviour.
 
 ## Requirements
 
