@@ -1,10 +1,14 @@
 # AI Pet Project
 
-A fully contained, daemonless, secure method for storing and using LLMs locally on a mounted SSD. Uses Podman, Ollama, and AnythingLLM.
+A fully contained, daemonless, secure method for storing and using LLMs locally on a mounted SSD using Podman. Includes a SIMPLE llama.cpp method for installing a Vulkan backend with llama.cpp for extensive AMD GPU support. Works on 6000 series with RDNA2! 4gb VRAM! You can run a 24b model without overheating!
+Also includes: Basic guides for Ollama, AnythingLLM
+And a cursory guide for installing and using Llamafile
+
+All with Podman! Everything runs as USER in an easy-to-use container.
 
 ## Overview
 
-Congratulations on choosing to build your own secure AI Pet! Soon you will be the proud owner of your very first Pokemon. We will be using Podman, Ollama, and AnythingLLM to put this all together, but never fear, the process is quite simple. 
+Congratulations on choosing to build your own secure AI Pet! Soon you will be the proud owner of your very first Pokemon. We will be using Podman, Ollama, and AnythingLLM to put this all together, but never fear, the process is quite simple. If you have an integrated GPU, please don't bother with anything else and use the LLAMA CPP guide above.
 
 ## Advantages
 
@@ -19,8 +23,6 @@ Here are some advantages over other methods:
 - **CPU-Based**: Everything runs via CPU, meaning the only limit is your computer's RAM.
 
 - **Full Capabilities**: The AI is still fully capable of agentic behaviour, including web browsing (if you let it).
-
-- EDIT: the LLAMAFILE SETUP README file has instructions on installing llamafile, which works similarly to ollama, **however it supports integrated GPUs.** Consider it a stronger alternative to ollama that is somewhat harder to use, but ultimately more rewarding. 
 
 ## Requirements
 
@@ -38,7 +40,7 @@ I have made this guide as simple and straightforward as possible. I am not a cod
 
 To get started, download PODMAN AI PET README near the top of this page.
 
-This guide now has an addendum, an expansion pack or DLC, that uses llamafiles. It supports integrated GPUs, meaning the AI works better. Everything in that readme still works under your podman container setup. Have fun!
+This guide now has an addendum, an expansion pack or DLC, that uses llama.cpp. It supports integrated GPUs, meaning the AI works better. Everything in that readme still works under your podman container setup. Have fun!
 
 ---
 
