@@ -1,7 +1,11 @@
 # AI Pet Project
 
-A fully contained, daemonless, secure method for storing and using LLMs locally on a mounted SSD using Podman. Includes a SIMPLE llama.cpp method for installing a Vulkan backend with llama.cpp for extensive AMD GPU support. Works on 6000 series with RDNA2! 4gb VRAM! You can run a 24b model without overheating!
+A fully contained, daemonless, secure method for storing and using LLMs locally on a mounted SSD using Podman. Includes a SIMPLE llama.cpp method for installing a Vulkan backend with llama.cpp for extensive AMD GPU support. 
+Works on 6000 series with RDNA2! 4gb VRAM! 
+You can run a 24b model without overheating!
+
 Also includes: Basic guides for Ollama, AnythingLLM
+
 And a cursory guide for installing and using Llamafile
 
 All with Podman! Everything runs as USER in an easy-to-use container.
