@@ -1,4 +1,14 @@
-FULLY ROOTLESS PODMAN LLM SETUP WITH LLAMA.CPP AND FULL VULKAN BACKEND SUPPORT
+LINUX/UBUNTU ROOTLESS AI SETUP: PODMAN WITH LLAMA.CPP AND FULL VULKAN BACKEND SUPPORT. ADDED OPEN WEBUI AND OPENHANDS
+=====================================================================================================================
+No sudo, no root, everything runs as your user! Now with integrated GPU support!
+
+IMPORTANT: Before starting this guide, ensure your SSD is mounted to /mnt/ssd/
+Also make sure you have podman set up. That's in the other README (PODMAN AI PET README)
+This guide is supplementary, and is designed to go further than what ollama can do.
+It is more private, can handle integrated gpus (it's stronger), and more complicated to set up.
+The good news is that it fundamentally runs through podman so it is still quite simple to handle and monitor.
+
+Enjoy!
 
 #===================================================================
 # INITIAL SETUP (one-time only) - PREPARING YOUR AI PET'S NEW HOME
@@ -24,14 +34,14 @@ mount /mnt/ssd
 ls -la /mnt/ssd
 
 
-STEP 1: INSTALL PODMAN
+STEP 2: INSTALL PODMAN
 ===========================================
 sudo apt update && sudo apt install -y podman
 # Fedora: sudo dnf install -y podman
 # Arch: sudo pacman -S podman
 
 
-STEP 1: PODMAN CONFIG
+STEP 3: PODMAN CONFIG
 ===========================================
 # Configure Podman storage location
 mkdir -p ~/.config/containers
@@ -143,7 +153,7 @@ podman run -d -t \
     -m /models/devstral2507.gguf \
     --host 0.0.0.0 \
     --port 8080 \
-    -ngl 99 \
+    -ngl 30 \
     -t 8 \
     -c 4096
 
@@ -187,16 +197,16 @@ podman run -d \
   -v $XDG_RUNTIME_DIR/podman/podman.sock:/var/run/docker.sock \
   -v /mnt/ssd/podman/openhands-state:/.openhands-state \
   -p 127.0.0.1:3001:3000 \
-  --add-host host.docker.internal:host-gateway \
   docker.all-hands.dev/all-hands-ai/openhands:0.17
 
 # Configure OpenHands:
 # 1. Go to http://localhost:3001
 # 2. Settings → LLM Configuration
 # 3. Provider: OpenAI Compatible
-# 4. API Base URL: http://llamafile:8080/v1
+# 4. API Base URL: http://llama-cpp-server:8080/v1
 # 5. API Key: not-needed
 # 6. Model: (use the model name returned by your llamafile)
+
 
 #=============================================================
 # STOP AND REMOVE CONTAINERS
@@ -211,5 +221,48 @@ podman rm llama-cpp-server
 
 # Check (you should see nothing)
 podman ps -a
+
+
+#=============================================================
+# GPU and CPU MONITORING
+#=============================================================
+# GPU monitoring (AMD)
+radeontop
+
+# CPU monitoring  
+htop
+
+# Container-specific stats
+podman stats llama-cpp-server
+
+#=============================================================
+# IMPORTANT NOTES
+#=============================================================
+There are many more commands for managing and using podman. Many of these are in the PODMAN readme setup, down the bottom of that file. Please consult that AND official documentation if you get stuck. Frankly though, everything is brand new and supercedes information from a year ago. This guide will probably be redundant in a month.
+
+
+
+ROOTLESS LIMITATIONS IN OPENHANDS
+==================================
+
+When OpenHands runs in rootless mode, both the OpenHands container and its 
+runtime containers operate without root privileges. The runtime container 
+(all-hands-ai/runtime) runs as a regular user inside the rootless Podman 
+environment, maintaining the security benefits of rootless operation.
+
+WILL FAIL:
+- apt/yum install (system packages)
+- Binding to ports below 1024
+- Modifying system files (/etc/*)
+- Creating system services
+
+WILL WORK:
+- pip install (Python packages → ~/.local)
+- npm install (Node packages → ./node_modules)
+- Running servers on high ports (3000, 8080, etc)
+- Building and running containers (via Podman)
+- All normal development tasks
+
+The AI will adapt and work around these limitations automatically!
 
 
