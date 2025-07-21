@@ -69,6 +69,7 @@ sudo tee /etc/containers/policy.json << 'EOF'
 }
 EOF
 
+
 #=============================================================
 # BUILDING THE ENVIRONMENT
 #=============================================================
@@ -122,14 +123,19 @@ CMD ["/bin/bash"]
 EOF
 
 
-STEP 3: BUILD IMAGE
+STEP 3: BUILD IMAGE FROM DOCKERFILE
 ===========================================
+cd /mnt/ssd/podman/llama-vulkan
 podman build -t llama-vulkan .
 
 
 STEP 4: CREATE INTERNAL NETWORK
 ===========================================
 podman network create llm-network
+
+STEP 5: START SOCKET
+===========================================
+systemctl --user start podman.socket
 
 
 #=============================================================
@@ -184,28 +190,36 @@ STEP 3: RUN OPENHANDS (ROOTLESS)
 mkdir -p /mnt/ssd/podman/openhands-state
 
 # Pull images
-podman pull docker.all-hands.dev/all-hands-ai/runtime:0.17-nikolaik
-podman pull docker.all-hands.dev/all-hands-ai/openhands:0.17
+podman pull docker.all-hands.dev/all-hands-ai/openhands:latest
+podman pull docker.all-hands.dev/all-hands-ai/runtime:latest
 
 # Run OpenHands with rootless Podman socket
 podman run -d \
   --name openhands \
   --network llm-network \
-  -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.17-nikolaik \
+  --security-opt label=disable \
+  -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:latest \
   -e LOG_ALL_EVENTS=true \
-  -e DOCKER_HOST=unix:///var/run/docker.sock \
   -v $XDG_RUNTIME_DIR/podman/podman.sock:/var/run/docker.sock \
   -v /mnt/ssd/podman/openhands-state:/.openhands-state \
   -p 127.0.0.1:3001:3000 \
-  docker.all-hands.dev/all-hands-ai/openhands:0.17
+  --add-host host.docker.internal:host-gateway \
+  docker.all-hands.dev/all-hands-ai/openhands:latest
 
-# Configure OpenHands:
+  -v ~/.openhands:/.openhands \
+
+## Configure OpenHands for llama-cpp
 # 1. Go to http://localhost:3001
 # 2. Settings → LLM Configuration
-# 3. Provider: OpenAI Compatible
-# 4. API Base URL: http://llama-cpp-server:8080/v1
-# 5. API Key: not-needed
-# 6. Model: (use the model name returned by your llamafile)
+# 3. Configure:
+#    - Provider: OpenAI Compatible
+#    - API Base URL: http://llama-cpp-server:8080/v1
+#    - API Key: not-needed
+#    - Model: models/devstral2507.gguf
+
+# OpenHands container control
+podman stop openhands
+podman rm openhands
 
 
 #=============================================================
