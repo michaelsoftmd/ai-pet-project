@@ -37,8 +37,6 @@ ls -la /mnt/ssd
 STEP 2: INSTALL PODMAN
 ===========================================
 sudo apt update && sudo apt install -y podman
-# Fedora: sudo dnf install -y podman
-# Arch: sudo pacman -S podman
 
 
 STEP 3: PODMAN CONFIG
@@ -133,9 +131,11 @@ STEP 4: CREATE INTERNAL NETWORK
 ===========================================
 podman network create llm-network
 
+
 STEP 5: START SOCKET
 ===========================================
-systemctl --user start podman.socket
+# Launch socket
+systemctl --user is-active --quiet podman.socket || systemctl --user start podman.socket
 
 
 #=============================================================
@@ -188,25 +188,28 @@ STEP 3: RUN OPENHANDS (ROOTLESS)
 =================================
 # Create state directory
 mkdir -p /mnt/ssd/podman/openhands-state
+mkdir -p ~/.openhands
 
 # Pull images
-podman pull docker.all-hands.dev/all-hands-ai/openhands:latest
-podman pull docker.all-hands.dev/all-hands-ai/runtime:latest
+podman pull docker.all-hands.dev/all-hands-ai/openhands:0.47
+
+podman pull pull docker.all-hands.dev/all-hands-ai/runtime:0.47-nikolaik
 
 # Run OpenHands with rootless Podman socket
 podman run -d \
   --name openhands \
   --network llm-network \
   --security-opt label=disable \
-  -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:latest \
+  -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.47-nikolaik \
   -e LOG_ALL_EVENTS=true \
   -v $XDG_RUNTIME_DIR/podman/podman.sock:/var/run/docker.sock \
   -v /mnt/ssd/podman/openhands-state:/.openhands-state \
   -p 127.0.0.1:3001:3000 \
-  --add-host host.docker.internal:host-gateway \
-  docker.all-hands.dev/all-hands-ai/openhands:latest
-
   -v ~/.openhands:/.openhands \
+  docker.all-hands.dev/all-hands-ai/openhands:0.47
+
+  --add-host host.docker.internal:host-gateway \
+
 
 ## Configure OpenHands for llama-cpp
 # 1. Go to http://localhost:3001
@@ -215,7 +218,7 @@ podman run -d \
 #    - Provider: OpenAI Compatible
 #    - API Base URL: http://llama-cpp-server:8080/v1
 #    - API Key: not-needed
-#    - Model: models/devstral2507.gguf
+#    - Model: models/devstral2507.gguf (or your choice)
 
 # OpenHands container control
 podman stop openhands
@@ -252,12 +255,14 @@ podman stats llama-cpp-server
 #=============================================================
 # IMPORTANT NOTES
 #=============================================================
-There are many more commands for managing and using podman. Many of these are in the PODMAN readme setup, down the bottom of that file. Please consult that AND official documentation if you get stuck. Frankly though, everything is brand new and supercedes information from a year ago. This guide will probably be redundant in a month.
+There are many more commands for managing and using podman. Many of these are in the PODMAN readme setup, down the bottom of that file. Please consult that AND official documentation if you get stuck. Frankly, everything is brand new and supercedes information you'll find in github etc. This guide will probably be redundant in a month.
 
 
 
 ROOTLESS LIMITATIONS IN OPENHANDS
 ==================================
+
+Openhands is currently still in development. I use both 0.47 of the client and runtime, but these can probably be updated to support a weird podman socket error I found in the making of this guide. Assume this version is already outdated. This is a problem directly relating to this being a rootless project.
 
 When OpenHands runs in rootless mode, both the OpenHands container and its 
 runtime containers operate without root privileges. The runtime container 
@@ -277,6 +282,6 @@ WILL WORK:
 - Building and running containers (via Podman)
 - All normal development tasks
 
-The AI will adapt and work around these limitations automatically!
+The AI will adapt and work around these limitations automatically! How fucked is that!
 
 
