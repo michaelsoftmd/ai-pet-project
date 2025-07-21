@@ -5,11 +5,11 @@ FULLY ROOTLESS PODMAN LLM SETUP WITH LLAMA.CPP AND FULL VULKAN BACKEND SUPPORT
 #===================================================================
 
 
-# IMPORTANT! ENSURE YOUR SSD IS FORMATTED TO EXT4, NOT NTFS/EXFAT. DRIVER ISSUES MAY OCCUR IF NOT.
+IMPORTANT! ENSURE YOUR SSD IS FORMATTED TO EXT4, NOT NTFS/EXFAT. DRIVER ISSUES MAY OCCUR IF NOT.
 
 
-# 1. SSD MOUNTING
-#--------------------
+STEP 1: SSD MOUNTING
+===========================================
 # Create mount point with user ownership
 sudo mkdir -p /mnt/ssd
 sudo chown $USER:$USER /mnt/ssd
@@ -24,15 +24,15 @@ mount /mnt/ssd
 ls -la /mnt/ssd
 
 
-# 2. INSTALL PODMAN
-#--------------------
+STEP 1: INSTALL PODMAN
+===========================================
 sudo apt update && sudo apt install -y podman
 # Fedora: sudo dnf install -y podman
 # Arch: sudo pacman -S podman
 
 
-# 3. PODMAN CONFIGURATION
-#--------------------
+STEP 1: PODMAN CONFIG
+===========================================
 # Configure Podman storage location
 mkdir -p ~/.config/containers
 mkdir -p /mnt/ssd/podman
@@ -116,6 +116,7 @@ STEP 3: BUILD IMAGE
 ===========================================
 podman build -t llama-vulkan .
 
+
 STEP 4: CREATE INTERNAL NETWORK
 ===========================================
 podman network create llm-network
@@ -137,18 +138,17 @@ podman run -d -t \
   --group-add video \
   --security-opt label=disable \
   -v /mnt/ssd/podman/llama-vulkan/models:/models \
-  -p 127.0.0.1:8080:8080 \
   llama-vulkan \
   /home/llamauser/llama.cpp/build/bin/llama-server \
     -m /models/devstral2507.gguf \
     --host 0.0.0.0 \
     --port 8080 \
     -ngl 99 \
+    -t 8 \
     -c 4096
 
 STEP 2: RUN OPEN WEBUI
 ======================
-
 podman run -d -t\
   --name open-webui \
   --network llm-network \
@@ -162,15 +162,14 @@ podman run -d -t\
 # 1. Go to http://localhost:3000
 # 2. Create account (first user becomes admin)
 # 3. Settings → Admin → Connections IT'S BEHIND, NOT THE POPUP LOOKING THING
-# 4. Add connection TO OPEN AI SETTING THING:
-#    - OPEN AI API Base URL: http://llamafile:8080/v1
+# 4. Go to ADMIN (v important) then CONNECTION then OPEN AI SETTING THING:
+#    - OPEN AI API Base URL: http://llama-cpp-server:8080/v1
 #    - OPEN AI API Key: not-needed
 # 5. Your model appears in the chat dropdown (check actual model name with curl http://localhost:8080/v1/models)
 
 
 STEP 3: RUN OPENHANDS (ROOTLESS)
 =================================
-
 # Create state directory
 mkdir -p /mnt/ssd/podman/openhands-state
 
@@ -198,5 +197,19 @@ podman run -d \
 # 4. API Base URL: http://llamafile:8080/v1
 # 5. API Key: not-needed
 # 6. Model: (use the model name returned by your llamafile)
+
+#=============================================================
+# STOP AND REMOVE CONTAINERS
+#=============================================================
+# Stops and removes all containers
+podman stop -a
+podman rm -a
+
+# Stops and removes server
+podman stop llama-cpp-server
+podman rm llama-cpp-server
+
+# Check (you should see nothing)
+podman ps -a
 
 
