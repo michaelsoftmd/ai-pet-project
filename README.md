@@ -24,7 +24,7 @@ Here are some advantages over other methods:
 
 - **Rootless Containers**: The AI itself runs rootless in its own container, meaning even if it 'broke out' it would have no permission to interfere with your system (no 'sudo').
 
-- **CPU-Based**: Everything runs via CPU, meaning the only limit is your computer's RAM.
+- **CPU or GPU**: You can choose between running your LLMs on CPU (with Ollama) or with AMD GPU acceleration (with llama.cpp and Vulkan).
 
 - **Full Capabilities**: The AI is still fully capable of agentic behaviour, including web browsing (if you let it).
 
