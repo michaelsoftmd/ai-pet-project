@@ -36,6 +36,9 @@ Here are some advantages over other methods:
 
 - **Full Capabilities**: The AI is still fully capable of agentic behaviour. CURRENTLY DEVELOPING ZENDRIVER SUPPORT.
 
+- **SPECIFIC FEATURES**: OpenHands functionality for an agentic development environment. Zendriver support for web automation of research and social media tasks. Open WebUi for a versatile chat interface. 
+
+
 ## Requirements
 
 There are some requirements, but these are simple:
