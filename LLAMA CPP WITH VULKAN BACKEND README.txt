@@ -152,6 +152,7 @@ podman run -d -t \
   --device /dev/dri \
   --device /dev/kfd \
   --group-add video \
+  --group-add keep-groups \
   --security-opt label=disable \
   -v /mnt/ssd/podman/llama-vulkan/models:/models \
   llama-vulkan \
@@ -159,9 +160,10 @@ podman run -d -t \
     -m /models/devstral2507.gguf \
     --host 0.0.0.0 \
     --port 8080 \
-    -ngl 30 \
+    -ngl 25 \
     -t 8 \
-    -c 4096
+    -c 4096 \
+    --flash-attn
 
 STEP 2: RUN OPEN WEBUI
 ======================
@@ -177,8 +179,8 @@ podman run -d -t\
 # Configure Open WebUI:
 # 1. Go to http://localhost:3000
 # 2. Create account (first user becomes admin)
-# 3. Settings → Admin → Connections IT'S BEHIND, NOT THE POPUP LOOKING THING
-# 4. Go to ADMIN (v important) then CONNECTION then OPEN AI SETTING THING:
+# 3. User - Settings - Admin settings - Connections
+# 4. Under OPEN AI setting:
 #    - OPEN AI API Base URL: http://llama-cpp-server:8080/v1
 #    - OPEN AI API Key: not-needed
 # 5. Your model appears in the chat dropdown (check actual model name with curl http://localhost:8080/v1/models)
@@ -208,8 +210,6 @@ podman run -d \
   -v ~/.openhands:/.openhands \
   docker.all-hands.dev/all-hands-ai/openhands:0.47
 
-  --add-host host.docker.internal:host-gateway \
-
 
 ## Configure OpenHands for llama-cpp
 # 1. Go to http://localhost:3001
@@ -218,7 +218,7 @@ podman run -d \
 #    - Provider: OpenAI Compatible
 #    - API Base URL: http://llama-cpp-server:8080/v1
 #    - API Key: not-needed
-#    - Model: models/devstral2507.gguf (or your choice)
+#    - Model: openai//models/devstral2507.gguf (or your choice)
 
 # OpenHands container control
 podman stop openhands
