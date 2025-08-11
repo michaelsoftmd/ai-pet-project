@@ -2,7 +2,7 @@
 
 A fully contained, daemonless, secure method for storing and using LLMs locally on a mounted SSD using Podman. Includes a SIMPLE llama.cpp method for installing a Vulkan backend with llama.cpp for extensive AMD GPU support. 
 Works on 6000 series with RDNA2! 4gb VRAM! 
-You can run a 24b model without overheating!
+You can run a 24b model at Q6 Quant without overheating!
 
 Also includes: Basic guides for Ollama, AnythingLLM
 
@@ -14,6 +14,9 @@ All with Podman! Everything runs as USER in an easy-to-use container.
 
 Congratulations on choosing to build your own secure AI Pet! Soon you will be the proud owner of your very first Pokemon. We will be using Podman, Ollama, and AnythingLLM to put this all together, but never fear, the process is quite simple. If you have an integrated GPU, please don't bother with anything else and use the LLAMA CPP guide above.
 
+UPDATE: I am now incorporating Zendriver support for web automation purposes. So far it works, with some awkward kinks that I am straightening out. Zendriver works by essentially providing a web browser and a set of instructions on how to use that browser to the LLM. That browser is fully contained inside Podman, can be used by the LLM for multiple purposes, and works by sending instructions to the LLM through Open WebUi. You can visually watch the LLM use that browser, safely and securely, from outside the container by use of a VNC program (also included).
+
+
 ## Advantages
 
 Here are some advantages over other methods:
@@ -24,9 +27,9 @@ Here are some advantages over other methods:
 
 - **Rootless Containers**: The AI itself runs rootless in its own container, meaning even if it 'broke out' it would have no permission to interfere with your system (no 'sudo').
 
-- **CPU or GPU**: You can choose between running your LLMs on CPU (with Ollama) or with AMD GPU acceleration (with llama.cpp and Vulkan).
+- **CPU or GPU**: You can choose between running your LLMs on CPU (with Ollama) or with AMD GPU acceleration (with llama.cpp and Vulkan). There is currently excellent support for AMD iGPUs, and this guide helps you find the best way to optimise your hardware.
 
-- **Full Capabilities**: The AI is still fully capable of agentic behaviour.
+- **Full Capabilities**: The AI is still fully capable of agentic behaviour. CURRENTLY DEVELOPING ZENDRIVER SUPPORT.
 
 ## Requirements
 
