@@ -6,7 +6,10 @@ You can run a 24b model at Q6 Quant without overheating!
 
 Also includes: Basic guides for Ollama, AnythingLLM
 
-And a cursory guide for installing and using Llamafile
+A cursory guide for installing and using Llamafile
+
+And something fun to read!
+
 
 All with Podman! Everything runs as USER in an easy-to-use container.
 
