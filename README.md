@@ -19,6 +19,8 @@ Congratulations on choosing to build your own secure AI Pet! Soon you will be th
 
 UPDATE: I am now incorporating Zendriver support for web automation purposes. So far it works, with some awkward kinks that I am straightening out. Zendriver works by essentially providing a web browser and a set of instructions on how to use that browser to the LLM. That browser is fully contained inside Podman, can be used by the LLM for multiple purposes, and works by sending instructions to the LLM through Open WebUi. You can visually watch the LLM use that browser, safely and securely, from outside the container by use of a VNC program (also included).
 
+ANOTHER UPDATE: I have built a docker-compose file that will easily run all services at the user's discretion. It will be uploaded along with updated dockerfiles when the project is completed. Please note the dockerfiles suggested in the README files are most likely outdated.
+
 
 ## Advantages
 
