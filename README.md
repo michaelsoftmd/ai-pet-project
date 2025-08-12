@@ -34,7 +34,7 @@ Here are some advantages over other methods:
 
 - **CPU or GPU**: You can choose between running your LLMs on CPU (with Ollama) or with AMD GPU acceleration (with llama.cpp and Vulkan). There is currently excellent support for AMD iGPUs, and this guide helps you find the best way to optimise your hardware.
 
-- **Full Capabilities**: The AI is still fully capable of agentic behaviour. CURRENTLY DEVELOPING ZENDRIVER SUPPORT.
+- **Secure Capabilities**: The AI is still capable of agentic behaviour, but doesn't have permission to mess with system files. CURRENTLY DEVELOPING ZENDRIVER SUPPORT.
 
 - **SPECIFIC FEATURES**: OpenHands functionality for an agentic development environment. Zendriver support for web automation of research and social media tasks. Open WebUi for a versatile chat interface. 
 
