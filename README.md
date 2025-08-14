@@ -15,7 +15,7 @@ All with Podman! Everything runs as USER in an easy-to-use container.
 
 ## Overview
 
-Congratulations on choosing to build your own secure AI Pet! Soon you will be the proud owner of your very first Pokemon. We will be using Podman, Ollama, and AnythingLLM to put this all together, but never fear, the process is quite simple. If you have an integrated GPU, please don't bother with anything else and use the LLAMA CPP guide above.
+Congratulations on choosing to build your own secure AI Pet! We will be using Podman, Ollama, and Open WebUI to put this all together, but never fear, the process is quite simple. If you have an integrated GPU, please don't bother with anything else and use the LLAMA CPP guide above.
 
 UPDATE: I am now incorporating Zendriver support for web automation purposes. So far it works, with some awkward kinks that I am straightening out. Zendriver works by providing a web browser and a set of instructions on how to use that browser to your local LLM. That browser is fully contained inside Podman, can be used by the LLM for multiple purposes, and works as the user sends instructions through Open WebUi. You can visually watch the LLM use that browser, safely and securely, from outside the container by use of a VNC program (also included).
 
