@@ -213,7 +213,7 @@ podman pause ollama
 podman unpause ollama
 
 
-# OLLAMA MODEL MANAGEMENT - THE MODELS ARE YOUR AI PETS. ENJOY THEM. YOU CAN HAVE LIKE A POKEMON TEAM.
+# OLLAMA MODEL MANAGEMENT - THE MODELS ARE YOUR AI PETS. ENJOY THEM.
 #--------------------
 # List all downloaded models
 podman exec ollama ollama list

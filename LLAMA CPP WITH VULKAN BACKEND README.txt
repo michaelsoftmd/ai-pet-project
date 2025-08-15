@@ -86,11 +86,21 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install base dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential cmake git wget curl libcurl4-openssl-dev \
-    mesa-vulkan-drivers mesa-utils \
-    libvulkan1 vulkan-tools \
-    libgl1-mesa-glx libgl1-mesa-dri libglx-mesa0 \
-    python3 python3-pip \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    curl \
+    libcurl4-openssl-dev \
+    mesa-vulkan-drivers \
+    mesa-utils \
+    libvulkan1 \
+    vulkan-tools \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglx-mesa0 \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and install Vulkan SDK
@@ -100,25 +110,43 @@ RUN wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/
     apt-get install -y vulkan-sdk && \
     rm -rf /var/lib/apt/lists/*
 
+# Set Vulkan environment variables
 ENV VULKAN_SDK=/usr
 ENV VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.x86_64.json:/usr/share/vulkan/icd.d/radeon_icd.i686.json
 ENV VK_LAYER_PATH=/usr/share/vulkan/explicit_layer.d
 
+# Create non-root user for running llama.cpp
 RUN useradd -m -s /bin/bash llamauser
 USER llamauser
 WORKDIR /home/llamauser
 
-RUN git clone https://github.com/ggerganov/llama.cpp.git && \
+# Clone and build llama.cpp with all optimizations
+# IMPORTANT: Use --no-cache when building to get latest version
+RUN git clone --depth 1 https://github.com/ggerganov/llama.cpp.git && \
     cd llama.cpp && \
     mkdir build && \
     cd build && \
-    cmake .. -DGGML_VULKAN=ON && \
+    cmake .. \
+        -DGGML_VULKAN=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DGGML_VULKAN_CHECK_RESULTS=OFF \
+        -DGGML_VULKAN_DEBUG=OFF \
+        -DGGML_VULKAN_MEMORY_DEBUG=OFF \
+        -DGGML_VULKAN_VALIDATE=OFF && \
     cmake --build . --config Release -j$(nproc)
 
+# Add the binaries to PATH
 ENV PATH="/home/llamauser/llama.cpp/build/bin:${PATH}"
-CMD ["/bin/bash"]
 
-EOF
+# Default working directory
+WORKDIR /home/llamauser
+
+# Health check endpoint for the server
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Default command (can be overridden in docker-compose.yml)
+CMD ["/bin/bash"]
 
 
 STEP 3: BUILD IMAGE FROM DOCKERFILE
@@ -160,10 +188,16 @@ podman run -d -t \
     -m /models/devstral2507.gguf \
     --host 0.0.0.0 \
     --port 8080 \
-    -ngl 25 \
-    -t 8 \
+# Below are some settings that affect Llama.cpp's GPU and CPU usage. Adjust them to suit. My machine is bad so it's highly optimised for a low-end GPU
+    -ngl 22 \
+    -t 6 \
     -c 4096 \
+    -b 128 \
+    -ub 64\
     --flash-attn
+    --mlock \
+    --jinja \
+    --cont-batching
 
 STEP 2: RUN OPEN WEBUI
 ======================
