@@ -24,9 +24,10 @@ ANOTHER UPDATE: I have built a docker-compose file that will easily run all serv
 
 ## Specific Features (some incoming)
 
-Open WebUI for a versatile chat interface. 
-OpenHands functionality for an agentic development environment.
-Zendriver support for web automation of research and social media tasks. 
+- Open WebUI for a versatile chat interface.
+- OpenHands functionality for an agentic development environment.
+- Zendriver support for web automation of research and social media tasks.
+  - Zendriver features: Navigation, clicking/typing, search, infinite scroll, data extract, page interaction. Currently also CACHES PAGE DATA to preserve context length. 
 
 ## Advantages
 
