@@ -22,11 +22,19 @@ UPDATE: I am now incorporating Zendriver support for web automation purposes. So
 ANOTHER UPDATE: I have built a docker-compose file that will easily run all services at the user's discretion. It will be uploaded along with updated dockerfiles when the project is completed. Please note the dockerfiles suggested in the README files are most likely outdated.
 
 
+## Specific Features (some incoming)
+
+Open WebUI for a versatile chat interface. 
+OpenHands functionality for an agentic development environment.
+Zendriver support for web automation of research and social media tasks. 
+
 ## Advantages
 
 Here are some advantages over other methods:
 
 - **External Storage**: Everything is stored externally. With simple changes this whole setup is transferable between computers.
+
+- **One Central Model Directory** For ease of use, all models are kept at /mnt/ssd/podman/models/gguf/[your model here]
 
 - **Localhost Security**: Everything runs from localhost, meaning a far lower chance of outside interference or monitoring.
 
@@ -35,8 +43,6 @@ Here are some advantages over other methods:
 - **CPU or GPU**: You can choose between running your LLMs on CPU (with Ollama) or with AMD GPU acceleration (with llama.cpp and Vulkan). There is currently excellent support for AMD iGPUs, and this guide helps you find the best way to optimise your hardware.
 
 - **Secure Capabilities**: The AI is still capable of agentic behaviour, but doesn't have permission to mess with system files. CURRENTLY DEVELOPING ZENDRIVER SUPPORT.
-
-- **SPECIFIC FEATURES**: OpenHands functionality for an agentic development environment. Zendriver support for web automation of research and social media tasks. Open WebUi for a versatile chat interface. 
 
 
 ## Requirements
@@ -51,7 +57,7 @@ There are some requirements, but these are simple:
 
 ## Getting Started
 
-I have made this guide as simple and straightforward as possible. I am not a coder by any means. I am a writer, so I have put it together from a beginner's mindset. This process should all be possible by someone who has decided to switch to Linux Mint after using Windows. Any errors should be covered in troubleshooting. I will add that the official documentation for the programs we will be using is quite complete, also, so you can refer to that if you get stuck.
+I have made this guide as simple and straightforward as possible. I am not a coder by any means. I am a writer, so I have put it together from a beginner's mindset. This process should all be possible by someone who has decided to switch to Linux Mint after using Windows. Any errors should be covered in troubleshooting. I will add that the official documentation for the programs we will be using is quite complete, also, so you can refer to that if you get stuck. If you have issues loading models, try creating a folder in the Podman working directory as /mnt/ssd/podman/models/gguf/[your models here]
 
 To get started, download PODMAN AI PET README near the top of this page.
 
