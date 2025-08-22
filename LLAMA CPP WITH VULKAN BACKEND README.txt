@@ -80,73 +80,66 @@ STEP 2: MAKE DOCKERFILE
 ===========================================
 cd /mnt/ssd/podman/llama-vulkan
 cat > Dockerfile << 'EOF'
-FROM docker.io/library/ubuntu:22.04
+ARG UBUNTU_VERSION=24.04
 
-ENV DEBIAN_FRONTEND=noninteractive
+FROM docker.io/library/ubuntu:$UBUNTU_VERSION AS build
 
-# Install base dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    git \
-    wget \
-    curl \
-    libcurl4-openssl-dev \
-    mesa-vulkan-drivers \
-    mesa-utils \
-    libvulkan1 \
-    vulkan-tools \
-    libgl1-mesa-glx \
-    libgl1-mesa-dri \
-    libglx-mesa0 \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+# Install build tools
+RUN apt update && apt install -y git build-essential cmake wget
 
-# Download and install Vulkan SDK
-RUN wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/apt/trusted.gpg.d/lunarg.asc && \
-    wget -qO /etc/apt/sources.list.d/lunarg-vulkan-jammy.list https://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list && \
-    apt-get update && \
-    apt-get install -y vulkan-sdk && \
-    rm -rf /var/lib/apt/lists/*
+# Install Vulkan SDK and cURL
+RUN wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | apt-key add - && \
+    wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list https://packages.lunarg.com/vulkan/lunarg-vulkan-noble.list && \
+    apt update -y && \
+    apt-get install -y vulkan-sdk libcurl4-openssl-dev curl
 
-# Set Vulkan environment variables
-ENV VULKAN_SDK=/usr
-ENV VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.x86_64.json:/usr/share/vulkan/icd.d/radeon_icd.i686.json
-ENV VK_LAYER_PATH=/usr/share/vulkan/explicit_layer.d
+# Clone the repository
+WORKDIR /app
+RUN git clone https://github.com/ggml-org/llama.cpp.git . && \
+    git submodule update --init --recursive
 
-# Create non-root user for running llama.cpp
-RUN useradd -m -s /bin/bash llamauser
-USER llamauser
-WORKDIR /home/llamauser
+# Build it
+RUN cmake -B build -DGGML_NATIVE=OFF -DGGML_VULKAN=1 -DLLAMA_BUILD_TESTS=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON && \
+    cmake --build build --config Release -j$(nproc)
 
-# Clone and build llama.cpp with all optimizations
-# IMPORTANT: Use --no-cache when building to get latest version
-RUN git clone --depth 1 https://github.com/ggerganov/llama.cpp.git && \
-    cd llama.cpp && \
-    mkdir build && \
-    cd build && \
-    cmake .. \
-        -DGGML_VULKAN=ON \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DGGML_VULKAN_CHECK_RESULTS=OFF \
-        -DGGML_VULKAN_DEBUG=OFF \
-        -DGGML_VULKAN_MEMORY_DEBUG=OFF \
-        -DGGML_VULKAN_VALIDATE=OFF && \
-    cmake --build . --config Release -j$(nproc)
+RUN mkdir -p /app/lib && \
+    find build -name "*.so" -exec cp {} /app/lib \;
 
-# Add the binaries to PATH
-ENV PATH="/home/llamauser/llama.cpp/build/bin:${PATH}"
+RUN mkdir -p /app/full \
+    && cp build/bin/* /app/full \
+    && cp *.py /app/full \
+    && cp -r gguf-py /app/full \
+    && cp -r requirements /app/full \
+    && cp requirements.txt /app/full \
+    && cp .devops/tools.sh /app/full/tools.sh
 
-# Default working directory
-WORKDIR /home/llamauser
+## Base image
+FROM ubuntu:$UBUNTU_VERSION AS base
 
-# Health check endpoint for the server
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+RUN apt-get update \
+    && apt-get install -y libgomp1 curl libvulkan-dev \
+    && apt autoremove -y \
+    && apt clean -y \
+    && rm -rf /tmp/* /var/tmp/* \
+    && find /var/cache/apt/archives /var/lib/apt/lists -not -name lock -type f -delete \
+    && find /var/cache -type f -delete
 
-# Default command (can be overridden in docker-compose.yml)
-CMD ["/bin/bash"]
+COPY --from=build /app/lib/ /app
+
+### Server target
+FROM base AS server
+
+ENV LLAMA_ARG_HOST=0.0.0.0
+
+COPY --from=build /app/full/llama-server /app
+
+WORKDIR /app
+
+HEALTHCHECK CMD [ "curl", "-f", "http://localhost:8080/health" ]
+
+ENTRYPOINT [ "/app/llama-server" ]
+
+EOF
 
 
 STEP 3: BUILD IMAGE FROM DOCKERFILE
@@ -172,32 +165,32 @@ systemctl --user is-active --quiet podman.socket || systemctl --user start podma
 
 STEP 1: RUN LLAMA.CPP WITH GPU ACCELERATION
 ===========================================
-# Run llama.cpp in server mode
-podman run -d -t \
+# Run llama.cpp in server mode maybe remove -t, unsure
+podman run -d -t\
   --name llama-cpp-server \
   --network llm-network \
-  --userns=keep-id \
-  --device /dev/dri \
-  --device /dev/kfd \
+  --device /dev/dri:/dev/dri \
+  --device /dev/kfd:/dev/kfd \
   --group-add video \
-  --group-add keep-groups \
+  --group-add $(getent group render | cut -d: -f3) \
   --security-opt label=disable \
-  -v /mnt/ssd/podman/llama-vulkan/models:/models \
+  --security-opt seccomp=unconfined \
+  --privileged \
+  -v /mnt/ssd/podman/models/gguf:/models:ro \
+  -p 127.0.0.1:8080:8080 \
+  -e HSA_OVERRIDE_GFX_VERSION=10.3.0 \
+  -e GGML_VULKAN_DEVICE=0 \
   llama-vulkan \
   /home/llamauser/llama.cpp/build/bin/llama-server \
-    -m /models/devstral2507.gguf \
+    -m /models/Jan-v1-4B-Q8_0.gguf \
     --host 0.0.0.0 \
     --port 8080 \
-# Below are some settings that affect Llama.cpp's GPU and CPU usage. Adjust them to suit. My machine is bad so it's highly optimised for a low-end GPU
-    -ngl 22 \
-    -t 6 \
-    -c 4096 \
-    -b 128 \
-    -ub 64\
-    --flash-attn
-    --mlock \
-    --jinja \
-    --cont-batching
+    -ngl 999 \
+    -t 4 \
+    -c 2048 \
+    -b 512 \
+    --flash-attn \
+    --mlock
 
 STEP 2: RUN OPEN WEBUI
 ======================
